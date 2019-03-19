@@ -8,6 +8,7 @@
 
 int main()
 {
-    char c[] = "DECLARE history fhdj ";
+    char c[] = "DECLARE history fhdj";
     struct call_data cd = parse(c);
+    printf("%u", cd.op);
 }

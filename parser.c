@@ -1,8 +1,22 @@
+#include <ctype.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "parser.h"
+
+
+static bool is_numeric(const char* literal)
+{
+    while (literal++) {
+        if (!isdigit(*literal)) {
+            return false;
+        }
+    }
+    return true;
+} 
+
 
 struct call_data parse(const char* line)
 {
@@ -27,8 +41,8 @@ struct call_data parse(const char* line)
         return ret;
     }
 
-    // every commands accepts at least one argument, thus
-    // there is at least one space present
+    // Every commands accepts at least one argument, thus
+    // there is at least one space present.
     char *space_pos = strchr(line, ' ');
     if (space_pos == NULL) {
         ret.op = o_error;
@@ -86,13 +100,15 @@ struct call_data parse(const char* line)
         *space_pos = '\0';
     }
 
-    // something isn't processed, according to format this is en error
+    // Something isn't processed, according to format this is en error.
     if (strchr(space_pos + 1, ' ') != NULL) {
         ret.op = o_error;
         return ret;
     }
+
+
     
-    // check if argument count is valid
+    // Check if argument count is valid.
     switch (ret.op) {
         case o_declare:
         case o_remove:
@@ -109,8 +125,28 @@ struct call_data parse(const char* line)
                 ret.op = o_error;
                 return ret;
             }
+            break;
+        default:
+            break;
     }
- 
+
+    // Every argument is a string of digits.
+    for (size_t i = 0; i < MAX_ARG_LIST_SIZE; ++i) {
+        if (ret.args[i] != NULL && !is_numeric(ret.args[i])) {
+            ret.op = o_error;
+            return ret;
+        }
+    }
+
+    // TODO: check for excessive arguments using line length computed ad the
+    // beginning
+
+    // to avoid "error: unused variable"
+#include <stdio.h>
+    printf("%zu", line_length);
+
+    // TODO: check if values fit in range (either 0, 1, 2, 3 or 1, ... ,2^64 - 1)
+
 
     return ret;
 }
