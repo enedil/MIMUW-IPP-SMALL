@@ -1,8 +1,10 @@
 #include <stdint.h>
 
+#define QUANTUM_STATE_COUNT
+
 struct history
 {
-    struct history *next[4];
+    (struct history *next)[QUANTUM_STATE_COUNT];
     uint64_t energy;
 };
 

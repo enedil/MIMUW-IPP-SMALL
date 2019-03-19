@@ -5,13 +5,6 @@
 #include "utils.h"
 
 
-#define QUANTUM_STATE_NUMBER 4;
-
-struct history
-{
-    struct history* next[];
-    uint64_t energy;
-};
 
 void history_init(struct history* hist, uint64_t energy)
 {

@@ -4,8 +4,9 @@ enum operations
 {
     // No operation, empty line, or comment.
     o_nop,
+    o_error,
     o_declare,
-    o_emove,
+    o_remove,
     o_valid,
     // Unary energy.
     o_energy1,
