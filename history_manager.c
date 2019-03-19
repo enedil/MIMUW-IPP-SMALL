@@ -1,13 +1,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "error.h"
 #include "history_manager.h"
 #include "utils.h"
 
+
+static const size_t quantum_state_number = 4;
+
 struct history
 {
-    struct history* next[4];
+    struct history* next[];
     uint64_t energy;
 };
 

@@ -1,1 +1,2 @@
 #define MAX_TOKEN_COUNT 3
+#define DIFFERENT_STATE_COUNT 4
