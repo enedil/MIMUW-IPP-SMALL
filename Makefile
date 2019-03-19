@@ -8,11 +8,11 @@ CFLAGS = $(COPTIMIZATION_LEVEL) $(CDEBUG) $(CVERSION) -Werror -Wall -Wextra -ped
 
 EXE = quantum_history
 
-SRC = main.c history_manager.c
+SRC = main.c history_manager.c parser.c
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
 
-all: $(patsubst %.cpp, %.o, $(SRC))
+all: $(patsubst %.c, %.o, $(SRC))
 	$(CC) $(CFLAGS) $< -o $(EXE)
