@@ -1,2 +1,15 @@
-#define MAX_TOKEN_COUNT 3
-#define DIFFERENT_STATE_COUNT 4
+#ifndef __constants_h
+#define __constants_h
+enum commands
+{
+    // No operation, empty line, or comment
+    nop, 
+    declare,
+    remove,
+    valid,
+    energy1,
+    energy2,
+    equal
+};
+
+#endif

@@ -1,14 +1,24 @@
-#include <stdint.h>
+#define MAX_ARG_LIST_SIZE 2
 
-
-#include "constants.h"
-
-struct tokenization
+enum operations
 {
-    const char *tokens[MAX_TOKEN_COUNT];
-    uint8_t len;
+    // No operation, empty line, or comment.
+    o_nop,
+    o_declare,
+    o_emove,
+    o_valid,
+    // Unary energy.
+    o_energy1,
+    // Diary energy.
+    o_energy2,
+    o_equal
+};  
+
+struct call_data
+{
+   enum operations op;
+   char *args[MAX_ARG_LIST_SIZE];
 };
 
+struct call_data parse(const char*);
 
-struct tokenization tokenize(const char*);
-void free_tokenization(struct tokenization);

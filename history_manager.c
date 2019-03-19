@@ -5,7 +5,7 @@
 #include "utils.h"
 
 
-static const size_t quantum_state_number = 4;
+#define QUANTUM_STATE_NUMBER 4;
 
 struct history
 {
