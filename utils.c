@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "error.h"
 
@@ -26,7 +27,11 @@ void free_zero(char** ptr)
     *ptr = NULL;
 }
 
-void log(const char* c, size_t log_level, FILE* fp = stderr)
+void logger(const char* c, int level, FILE* fp)
 {
-    fprintf(fp, "%s\n", c);
+    if (LOG_LEVEL >= level) {
+        fprintf(fp, "%s\n", c);
+    }
 }
+
+

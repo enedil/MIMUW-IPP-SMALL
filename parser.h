@@ -21,5 +21,5 @@ struct call_data
    char *args[MAX_ARG_LIST_SIZE];
 };
 
-struct call_data parse(const char*);
+struct call_data parse(char*);
 

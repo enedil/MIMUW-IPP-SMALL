@@ -18,10 +18,8 @@ int main()
             panic();
         }
         struct call_data cmd = parse(line);
-        //printf("operation number: %u", cmd.op);
 
-
-
+        printf("op_code: %d, arg1: %p, arg2: %p\n", cmd.op, cmd.args[0], cmd.args[1]);
 
 
         free_zero(&line);

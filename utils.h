@@ -1,12 +1,24 @@
+#ifndef __utils_h
+#define __utils_h
 
-enum log_level = {
+
+#include <stdio.h>
+
+
+#define QUANTUM_STATE_COUNT 4
+
+enum log_level {
     l_none,
     l_critical,
     l_debug
 };
 
+void logger(const char*, int, FILE*);
 
 int char_to_int(char);
 void panic();
 void free_zero(char**);
 
+
+
+#endif

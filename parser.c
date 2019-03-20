@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "parser.h"
+#include "utils.h"
 
 
 static bool is_numeric(const char* literal)
@@ -18,14 +19,31 @@ static bool is_numeric(const char* literal)
 } 
 
 
-struct call_data parse(const char* line)
+static bool is_valid_history(const char* hist)
+{
+    do {
+        int n = char_to_int(*hist);
+        if (n < 0 || n >= QUANTUM_STATE_COUNT) {
+            return false;
+        }
+    } while (*(++hist));
+    return true;
+}
+
+
+struct call_data parse(char* line)
 {
     struct call_data ret = {0};
     if (line == NULL) {
         goto error;
     }
 
-    //size_t line_length = strlen(line);
+
+    size_t line_length = strlen(line);
+    if (line[line_length - 1] != '\n') {
+        goto error;
+    }
+    line[line_length - 1] = '\0';
 
     // This is the only possible form of empty line.
     // It is treated as a nop.
@@ -63,17 +81,19 @@ struct call_data parse(const char* line)
     } else if (strcmp(line, "ENERGY") == 0) {
         // Count the number of occurences of space.
         int count = 0;
-        for (char *p = space_pos + 1; *p != 0; ++p) {
-            if (*p == ' ') {
+        char *c = space_pos + 1;
+        while (*c) {
+            if (*c == ' ') {
                 count++;
             }
+            c++;
         }
 
         switch (count) {
-            case 1:
+            case 0:
                 ret.op = o_energy1;
                 break;
-            case 2:
+            case 1:
                 ret.op = o_energy2;
                 break;
             default:
@@ -86,7 +106,7 @@ struct call_data parse(const char* line)
     }
 
    
-    for (size_t arg_index = 0; arg_index < MAX_ARG_LIST_SIZE - 1; ++arg_index) {
+    for (size_t arg_index = 0; arg_index < MAX_ARG_LIST_SIZE; ++arg_index) {
         ret.args[arg_index] = space_pos + 1;
         space_pos = strchr(space_pos + 1, ' ');
         if (space_pos == NULL) {
@@ -95,6 +115,7 @@ struct call_data parse(const char* line)
         *space_pos = '\0';
     }
 
+    //
     // Something isn't processed, according to format this is en error.
     if (space_pos != NULL && strchr(space_pos + 1, ' ') != NULL) {
         goto error;
@@ -134,6 +155,7 @@ struct call_data parse(const char* line)
 
     
 
+    // first arguments of ENERGY1 should be a valid history
     // second argument should be in range [1, 2^64 - 1]
     if (ret.op == o_energy1) {
         const char max_uint64_t[] = "18446744073709551615";
@@ -145,6 +167,18 @@ struct call_data parse(const char* line)
         }
         if (*ret.args[1] == '0' || *ret.args[1] == '\0') {
             goto error;
+        }
+
+        if (!is_valid_history(ret.args[0])) {
+            goto error;
+        }
+    } else {
+        // every other command takes quantum history strings, which can consist
+        // of numbers from 0 to QUANTUM_STATE_COUNT - 1
+        for (size_t i = 0; i < MAX_ARG_LIST_SIZE; ++i) {
+            if (ret.args[i] != NULL && !is_valid_history(ret.args[i])) {
+                goto error;
+            }
         }
     }
 
