@@ -14,10 +14,17 @@ EXE = quantum_history
 
 SRC = main.c utils.c parser.c # history_manager.c
 
+all: $(patsubst %.c, %.o, $(SRC))
+	$(CC) $(CFLAGS) $^ -o $(EXE)
+
 .c.o:
 	$(CC) $(CFLAGS) $(DEFINES) -c $<
 
+.PHONY: clean
 
-all: $(patsubst %.c, %.o, $(SRC))
-	$(CC) $(CFLAGS) $^ -o $(EXE)
+clean:
+	-rm *.o
+	-rm $(EXE)
+
+
 
