@@ -1,7 +1,8 @@
 #!/usr/bin/env make
 
-CC = gcc
-CVERSION = -std=gnu11
+#CC = gcc
+CC = ../afl-2.52b/afl-gcc
+CVERSION = -std=c11
 CDEBUG = -g
 COPTIMIZATION_LEVEL = -O0
 CFLAGS = $(COPTIMIZATION_LEVEL) $(CDEBUG) $(CVERSION) -Werror -Wall -Wextra \
@@ -12,7 +13,7 @@ DEFINES = -DLOG_LEVEL=3
 
 EXE = quantum_history
 
-SRC = main.c utils.c parser.c # history_manager.c
+SRC = main.c utils.c parser.c history_manager.c
 
 all: $(patsubst %.c, %.o, $(SRC))
 	$(CC) $(CFLAGS) $^ -o $(EXE)

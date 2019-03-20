@@ -39,12 +39,6 @@ struct call_data parse(char* line)
     }
 
 
-    size_t line_length = strlen(line);
-    if (line[line_length - 1] != '\n') {
-        goto error;
-    }
-    line[line_length - 1] = '\0';
-
     // This is the only possible form of empty line.
     // It is treated as a nop.
     if (line[0] == '\0') {
@@ -56,6 +50,27 @@ struct call_data parse(char* line)
     if (line[0] == '#') {
         ret.op = o_nop;
         return ret;
+    }
+
+
+    size_t line_length = strlen(line);
+    if (line_length == 1) {
+        ret.op = o_nop;
+        return ret;
+    }
+    if (line[line_length - 1] != '\n') {
+        goto error;
+    }
+    line[line_length - 1] = '\0';
+
+    int space_count = 0;
+    for (size_t i = 0; i < line_length - 1; ++i) {
+        if (line[i] == ' ') {
+            space_count++;
+        }
+    }
+    if (space_count > 2) {
+        goto error;
     }
 
     // Every commands accepts at least one argument, thus
@@ -150,19 +165,20 @@ struct call_data parse(char* line)
         }
     }
 
-    // TODO: check for excessive arguments using line length computed at the
-    // beginning
-
-    
 
     // first arguments of ENERGY1 should be a valid history
     // second argument should be in range [1, 2^64 - 1]
-    if (ret.op == o_energy1) {
-        const char max_uint64_t[] = "18446744073709551615";
-        if (strlen(ret.args[1]) > 20) {
+    if (ret.op == o_energy2) {
+        char max_uint64_t[] = "18446744073709551615";
+        size_t max_len = strlen(max_uint64_t);
+//        if (ret.args[1] == NULL) {
+  //          goto error;
+    //    }
+        size_t len = strlen(ret.args[1]);
+        if (len > max_len) {
             goto error;
         }
-        if (strcmp(ret.args[1], max_uint64_t) > 0) {
+        if (len == max_len && strcmp(ret.args[1], max_uint64_t) > 0) {
             goto error;
         }
         if (*ret.args[1] == '0' || *ret.args[1] == '\0') {

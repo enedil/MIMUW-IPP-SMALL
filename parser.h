@@ -2,16 +2,13 @@
 
 enum operations
 {
-    // No operation: empty line, or comment.
-    o_nop,
+    o_nop,             // no operation: empty line, or comment
     o_error,
     o_declare,
     o_remove,
     o_valid,
-    // Unary energy.
-    o_energy1,
-    // Diary energy.
-    o_energy2,
+    o_energy1,         // unary energy command
+    o_energy2,         // dyadic energy command
     o_equal
 };  
 

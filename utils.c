@@ -13,7 +13,7 @@ int char_to_int(char c)
     return c - '0';
 }
 
-void panic()
+void panic(void)
 {
     exit(1);
 }

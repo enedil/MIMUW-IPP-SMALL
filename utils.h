@@ -10,15 +10,16 @@
 enum log_level {
     l_none,
     l_critical,
+    l_info,
     l_debug
 };
 
 void logger(const char*, int, FILE*);
 
 int char_to_int(char);
-void panic();
-void free_zero(char**);
 
+// exits the process, called if memory allocation failed
+void panic(void);
 
 
 #endif
