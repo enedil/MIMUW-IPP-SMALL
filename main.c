@@ -68,4 +68,8 @@ int main()
         line = NULL;
         line_len = 0;
     }
+    
+    // remove whole tree
+    history_remove(&hist, "");
+    free(line);
 }
