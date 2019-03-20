@@ -48,6 +48,15 @@ int main()
                 }
                 break;
             case o_energy1:
+                {
+                    uint64_t e = history_energy1(&hist, cmd.args[0]);
+                    if (e == 0) {
+                        fprintf(stderr, "ERROR\n");
+                    } else {
+                        printf("%lu\n", e);
+                    }
+                }
+                break;
             case o_energy2:
             case o_equal:
                 logger("not implemented", l_critical, stderr);

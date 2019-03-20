@@ -21,6 +21,7 @@ void history_declare(struct history* hist, const char* prefix)
     }
     int first_digit = char_to_int(prefix[0]);
     if (hist->next[first_digit] == NULL) {
+        // side effect of calloc is setting cls pointer to NULL
         hist->next[first_digit] = calloc(sizeof (struct history), 1);
         if (hist->next[first_digit] == NULL) {
             panic();
@@ -68,7 +69,7 @@ bool history_valid(const struct history* hist, const char* hist_string)
     return history_valid(hist->next[first_digit], hist_string + 1);
 }
 
-uint64_t energy1(const struct history* hist, const char* hist_string)
+uint64_t history_energy1(const struct history* hist, const char* hist_string)
 {
     // 0 means error
     
@@ -87,5 +88,5 @@ uint64_t energy1(const struct history* hist, const char* hist_string)
     if (hist->next[first_digit] == NULL) {
         return 0;
     }
-    return energy1(hist->next[first_digit], hist_string + 1);
+    return history_energy1(hist->next[first_digit], hist_string + 1);
 }
