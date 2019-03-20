@@ -9,11 +9,11 @@
 
 static bool is_numeric(const char* literal)
 {
-    while (literal++) {
+    do {
         if (!isdigit(*literal)) {
             return false;
         }
-    }
+    } while (*(++literal));
     return true;
 } 
 
@@ -22,11 +22,10 @@ struct call_data parse(const char* line)
 {
     struct call_data ret = {0};
     if (line == NULL) {
-        ret.op = o_error; 
-        return ret;
+        goto error;
     }
 
-    size_t line_length = strlen(line);
+    //size_t line_length = strlen(line);
 
     // This is the only possible form of empty line.
     // It is treated as a nop.
@@ -45,14 +44,12 @@ struct call_data parse(const char* line)
     // there is at least one space present.
     char *space_pos = strchr(line, ' ');
     if (space_pos == NULL) {
-        ret.op = o_error;
-        return ret;
+        goto error;
     }
 
     // Every command is at most 7 characters long.
     if (space_pos - line > 7) {
-        ret.op = o_error;
-        return ret;
+        goto error;
     }
 
 
@@ -80,14 +77,12 @@ struct call_data parse(const char* line)
                 ret.op = o_energy2;
                 break;
             default:
-                ret.op = o_error;
-                return ret;
+                goto error;
         }
     } else if (strcmp(line, "EQUAL") == 0) {
         ret.op = o_equal;
     } else {
-        ret.op = o_error;
-        return ret;
+        goto error;
     }
 
    
@@ -101,9 +96,8 @@ struct call_data parse(const char* line)
     }
 
     // Something isn't processed, according to format this is en error.
-    if (strchr(space_pos + 1, ' ') != NULL) {
-        ret.op = o_error;
-        return ret;
+    if (space_pos != NULL && strchr(space_pos + 1, ' ') != NULL) {
+        goto error;
     }
 
 
@@ -115,15 +109,13 @@ struct call_data parse(const char* line)
         case o_valid:
         case o_energy1:
             if (ret.args[0] == NULL || ret.args[1] != NULL) {
-                ret.op = o_error;
-                return ret;
+                goto error;
             }
             break;
         case o_energy2:
         case o_equal:
             if (ret.args[0] == NULL || ret.args[1] == NULL) {
-                ret.op = o_error;
-                return ret;
+                goto error;
             }
             break;
         default:
@@ -133,20 +125,34 @@ struct call_data parse(const char* line)
     // Every argument is a string of digits.
     for (size_t i = 0; i < MAX_ARG_LIST_SIZE; ++i) {
         if (ret.args[i] != NULL && !is_numeric(ret.args[i])) {
-            ret.op = o_error;
-            return ret;
+            goto error;
         }
     }
 
-    // TODO: check for excessive arguments using line length computed ad the
+    // TODO: check for excessive arguments using line length computed at the
     // beginning
 
-    // to avoid "error: unused variable"
-#include <stdio.h>
-    printf("%zu", line_length);
+    
 
-    // TODO: check if values fit in range (either 0, 1, 2, 3 or 1, ... ,2^64 - 1)
+    // second argument should be in range [1, 2^64 - 1]
+    if (ret.op == o_energy1) {
+        const char max_uint64_t[] = "18446744073709551615";
+        if (strlen(ret.args[1]) > 20) {
+            goto error;
+        }
+        if (strcmp(ret.args[1], max_uint64_t) > 0) {
+            goto error;
+        }
+        if (*ret.args[1] == '0' || *ret.args[1] == '\0') {
+            goto error;
+        }
+    }
 
 
+    return ret;
+
+
+error:
+    ret.op = o_error;
     return ret;
 }

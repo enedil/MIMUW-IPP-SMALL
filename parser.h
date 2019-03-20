@@ -2,7 +2,7 @@
 
 enum operations
 {
-    // No operation, empty line, or comment.
+    // No operation: empty line, or comment.
     o_nop,
     o_error,
     o_declare,
