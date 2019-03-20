@@ -71,6 +71,21 @@ bool history_valid(const struct history* hist, const char* hist_string)
 uint64_t energy1(const struct history* hist, const char* hist_string)
 {
     // 0 means error
-    return (uint64_t)hist + (uint64_t)hist_string;
+    
+    // Take one element before the last.
+    // Since every string here is nonempty, this won't cause memory access
+    // violation.
+    if (hist_string[1] == '\0') {
+        if (hist->cls == NULL) {
+            return 0;
+        }
+        return hist->cls->energy;
+    }
 
+
+    int first_digit = char_to_int(hist_string[0]);
+    if (hist->next[first_digit] == NULL) {
+        return 0;
+    }
+    return energy1(hist->next[first_digit], hist_string + 1);
 }
