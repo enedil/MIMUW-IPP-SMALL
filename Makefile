@@ -14,8 +14,9 @@ DEFINES = -DLOG_LEVEL=3
 EXE = quantum_history
 
 SRC = main.c utils.c parser.c history_manager.c
+HEADERS = utils.h parser.h history_manager.h
 
-all: $(patsubst %.c, %.o, $(SRC))
+all: $(patsubst %.c, %.o, $(SRC)) $(HEADERS)
 	$(CC) $(CFLAGS) $^ -o $(EXE)
 
 .c.o:
