@@ -76,10 +76,10 @@ void energy_delete(ecls* node)
 }
 
 
-uint64_t energy_of_molecule(struct history* hist)
+static inline void compress_energy_path(struct history *hist)
 {
     if (hist->cls->successor == NULL) {
-        return hist->cls->energy;
+        return;
     }
 
     hist->cls->ref_count--;
@@ -88,5 +88,28 @@ uint64_t energy_of_molecule(struct history* hist)
     } else {
         hist->cls = hist->cls->successor;
     }
-    return energy_of_molecule(hist);
+    compress_energy_path(hist);
+}
+
+// TODO: what if input is NULL?
+
+// erroneus output is 0
+uint64_t energy_of_molecule(struct history *hist)
+{
+    if (hist->cls == NULL) {
+        return 0;
+    }
+    compress_energy_path(hist);
+    return hist->cls->energy;
+}
+
+
+// assigns energy for a molecule
+void energy_set(ecls *begin, struct history *hist, uint64_t energy)
+{
+    if (hist->cls == NULL) {
+        hist->cls = energy_insert_begin();
+    }
+    compress_energy_path(hist);
+    hist->cls->energy = energy;
 }
