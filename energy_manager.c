@@ -3,6 +3,7 @@
 
 
 #include "energy_manager.h"
+#include "history_manager.h"
 #include "utils.h"
 
 
@@ -55,4 +56,37 @@ void energy_delete_all(ecls* begin)
         current = current->next;
         free(current->prev);
     }
+}
+
+// prevents from deleting begin and end, since they are not heap-allocated 
+// (and are required for subsequent correct functioning of data structures
+void energy_delete(ecls* node)
+{
+    if (is_terminal(node)) {
+        return;
+    }
+
+    ecls* prev = node->prev;
+    ecls* next = node->next;
+
+    prev->next = next;
+    next->prev = prev;
+
+    free(node);
+}
+
+
+uint64_t energy_of_molecule(struct history* hist)
+{
+    if (hist->cls->successor == NULL) {
+        return hist->cls->energy;
+    }
+
+    hist->cls->ref_count--;
+    if (hist->cls->ref_count == 0) {
+        energy_delete(hist->cls);
+    } else {
+        hist->cls = hist->cls->successor;
+    }
+    return energy_of_molecule(hist);
 }

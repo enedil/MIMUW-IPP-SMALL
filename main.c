@@ -19,7 +19,7 @@ int main()
     energy_init(&begin, &end);
     energy_insert_begin(&begin, 432);
     energy_insert_begin(&begin, 515);
-    energy_insert_begin(&begin, 123);
+    energy_delete(energy_insert_begin(&begin, 123));
     energy_insert_begin(&begin, 4);
     energy_delete_all(&begin);
 
