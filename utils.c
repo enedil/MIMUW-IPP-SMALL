@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include "error.h"
@@ -34,4 +35,10 @@ void logger(const char* c, int level, FILE* fp)
     }
 }
 
-
+uint64_t average(uint64_t a, uint64_t b)
+{
+    if (a + b > a) {
+        return (a + b)/2 - (((uint64_t)1) << 32);
+    }
+    return (a + b) / 2;
+}
