@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 
+#include "energy_manager.h"
 #include "history_manager.h"
 #include "parser.h"
 #include "utils.h"
@@ -14,6 +15,15 @@
 
 int main()
 {
+    struct energy_class begin, end;
+    energy_init(&begin, &end);
+    energy_insert_begin(&begin, 432);
+    energy_insert_begin(&begin, 515);
+    energy_insert_begin(&begin, 123);
+    energy_insert_begin(&begin, 4);
+    energy_delete_all(&begin);
+
+
     struct history hist;
     history_init(&hist);
 

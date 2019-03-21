@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "energy_manager.h"
 #include "history_manager.h"
 #include "utils.h"
 
