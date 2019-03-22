@@ -17,11 +17,6 @@ int main()
 {
     struct energy_class begin, end;
     energy_init(&begin, &end);
-    energy_insert_begin(&begin, 432);
-    energy_insert_begin(&begin, 515);
-    energy_delete(energy_insert_begin(&begin, 123));
-    energy_insert_begin(&begin, 4);
-    energy_delete_all(&begin);
 
 
     struct history hist;
@@ -93,6 +88,7 @@ int main()
         line_len = 0;
     }
     
+    energy_delete_all(&begin);
     // remove whole tree
     history_remove(&hist, "");
     free(line);
