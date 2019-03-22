@@ -85,7 +85,8 @@ static inline void compress_energy_path(struct history *hist)
     hist->cls->ref_count--;
     if (hist->cls->ref_count == 0) {
         energy_delete(hist->cls);
-    } else {
+    }
+    else {
         hist->cls->successor->ref_count++;
         hist->cls = hist->cls->successor;
     }

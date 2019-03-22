@@ -91,11 +91,14 @@ struct call_data parse(char* line)
     *space_pos = '\0';
     if (strcmp(line, "DECLARE") == 0) {
         ret.op = o_declare;
-    } else if (strcmp(line, "REMOVE") == 0) {
+    } 
+    else if (strcmp(line, "REMOVE") == 0) {
         ret.op = o_remove;
-    } else if (strcmp(line, "VALID") == 0) {
+    }
+    else if (strcmp(line, "VALID") == 0) {
         ret.op = o_valid;
-    } else if (strcmp(line, "ENERGY") == 0) {
+    }
+    else if (strcmp(line, "ENERGY") == 0) {
         // Count the number of occurences of spaces.
         int count = 0;
         char *c = space_pos + 1;
@@ -116,9 +119,11 @@ struct call_data parse(char* line)
         default:
             goto error;
         }
-    } else if (strcmp(line, "EQUAL") == 0) {
+    }
+    else if (strcmp(line, "EQUAL") == 0) {
         ret.op = o_equal;
-    } else {
+    }
+    else {
         goto error;
     }
 
@@ -189,7 +194,8 @@ struct call_data parse(char* line)
         if (!is_valid_history(ret.args[0])) {
             goto error;
         }
-    } else {
+    } 
+    else {
         // Every other command takes quantum history strings, which can consist
         // of numbers between 0 and QUANTUM_STATE_COUNT - 1.
         for (size_t i = 0; i < MAX_ARG_LIST_SIZE; ++i) {
