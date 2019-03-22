@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -86,6 +87,7 @@ static inline void compress_energy_path(struct history *hist)
     if (hist->cls->ref_count == 0) {
         energy_delete(hist->cls);
     } else {
+        hist->cls->successor->ref_count++;
         hist->cls = hist->cls->successor;
     }
     compress_energy_path(hist);
@@ -94,7 +96,7 @@ static inline void compress_energy_path(struct history *hist)
 // TODO: what if input is NULL?
 
 // erroneus output is 0
-uint64_t energy_of_molecule(struct history *hist)
+uint64_t energy_get(struct history *hist)
 {
     if (hist->cls == NULL) {
         return 0;
@@ -105,11 +107,61 @@ uint64_t energy_of_molecule(struct history *hist)
 
 
 // assigns energy for a molecule
-void energy_set(ecls *begin, struct history *hist, uint64_t energy)
+bool energy_set(ecls *begin, struct history* root, const char *hist_string, uint64_t energy)
 {
+    struct history *hist = history_from_str(root, hist_string);
+    if (hist == NULL) {
+        return false;
+    }
     if (hist->cls == NULL) {
-        hist->cls = energy_insert_begin();
+        hist->cls = energy_insert_begin(begin, energy);
     }
     compress_energy_path(hist);
     hist->cls->energy = energy;
+
+    return true;
+}
+
+
+// true if success, false if failure
+bool energy_merge(struct history *root, const char *h1, const char *h2)
+{
+    struct history *hist1 = history_from_str(root, h1);
+    struct history *hist2 = history_from_str(root, h2);
+    if (hist1 == NULL || hist2 == NULL) {
+        return false;
+    }
+
+    // side effect is compressing paths, thus it is done above the next
+    // conditional
+    uint64_t energy_1 = energy_get(hist1), energy_2 = energy_get(hist2);
+
+    // according to specification, equalizing same molecules is a nop
+    if (hist1->cls == hist2->cls) {
+        return true;
+    }
+
+    if (energy_1 == 0 && energy_2 == 0) {
+        false;
+    }
+
+    if (energy_1 == 0) {
+        hist1->cls = hist2->cls;
+        hist1->cls->ref_count++;
+    } else if (energy_2 == 0) {
+        hist2->cls = hist1->cls;
+        hist2->cls->ref_count++;
+    } else {
+        if (hist1->cls->ref_count > hist2->cls->ref_count) {
+            hist1->cls->energy = average(energy_1, energy_2);
+            hist2->cls->energy = 0;
+            hist2->cls->successor = hist1->cls;
+        } else {
+            hist2->cls->energy = average(energy_1, energy_2);
+            hist1->cls->energy = 0;
+            hist1->cls->successor = hist2->cls;
+        }
+    }
+
+    return true;
 }
