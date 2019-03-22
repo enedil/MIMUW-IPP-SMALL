@@ -16,7 +16,7 @@ int char_to_int(char c)
 
 void panic(void)
 {
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 void err(void)
@@ -38,13 +38,6 @@ void free_zero(char** ptr)
     *ptr = NULL;
 }
 
-void logger(const char* c, int level, FILE* fp)
-{
-    if (LOG_LEVEL >= level) {
-        fprintf(fp, "%s\n", c);
-    }
-}
-
 uint64_t average(uint64_t a, uint64_t b)
 {
     if (a > b) {
@@ -55,6 +48,7 @@ uint64_t average(uint64_t a, uint64_t b)
         return c/2 + a;
     }
 }
+
 
 uint64_t atoull(const char* number)
 {
