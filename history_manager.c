@@ -57,37 +57,27 @@ void history_remove(struct history* hist, const char* prefix)
 
 }
 
-bool history_valid(const struct history* hist, const char* hist_string)
+struct history* history_from_str(struct history* hist, const char* hist_string)
 {
     if (hist_string[0] == '\0') {
-        return true;
+        return hist;
     }
     
     int first_digit = char_to_int(hist_string[0]);
     if (hist->next[first_digit] == NULL) {
-        return false;
+        return NULL;
     }
-    return history_valid(hist->next[first_digit], hist_string + 1);
+    return history_from_str(hist->next[first_digit], hist_string + 1);
 }
 
-uint64_t history_energy1(const struct history* hist, const char* hist_string)
+uint64_t history_energy_get(struct history *root, const char *hist_string)
 {
     // 0 means error
     
-    // Take one element before the last.
-    // Since every string here is nonempty, this won't cause memory access
-    // violation.
-    if (hist_string[1] == '\0') {
-        if (hist->cls == NULL) {
-            return 0;
-        }
-        return hist->cls->energy;
-    }
-
-
-    int first_digit = char_to_int(hist_string[0]);
-    if (hist->next[first_digit] == NULL) {
+    struct history *hist = history_from_str(root, hist_string);
+    if (hist == NULL) {
         return 0;
     }
-    return history_energy1(hist->next[first_digit], hist_string + 1);
+    return energy_get(hist);
 }
+

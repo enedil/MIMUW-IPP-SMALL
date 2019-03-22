@@ -18,7 +18,7 @@ struct history
 void history_declare(struct history*, const char*);
 void history_init(struct history* hist);
 void history_remove(struct history*, const char*);
-bool history_valid(const struct history*, const char*);
-uint64_t history_energy1(const struct history*, const char*);
+struct history* history_from_str(struct history*, const char*);
+uint64_t history_energy_get(struct history*, const char*);
 
 #endif
