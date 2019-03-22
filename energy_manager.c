@@ -9,7 +9,6 @@
 
 
 typedef struct energy_class ecls;
-
 /*
 static bool energy_list_invariant_check(ecls *begin, ecls *end)
 {
@@ -29,8 +28,8 @@ static bool energy_list_invariant_check(ecls *begin, ecls *end)
             return false;
         }
     }
-}
-*/
+    return true;
+}*/
 
 static inline bool is_terminal(ecls* node)
 {
@@ -153,18 +152,22 @@ bool energy_merge(struct history *root, const char *h1, const char *h2)
         return false;
     }
 
-    // side effect is compressing paths, thus it is done above the next
+    if (hist1 == hist2) {
+        return true;
+    }
+
+    // side effect is compressing paths, thus it is done before the next
     // conditional
     uint64_t energy_1 = energy_get(hist1), energy_2 = energy_get(hist2);
+    if (energy_1 == 0 && energy_2 == 0) {
+        return false;
+    }
 
     // according to specification, equalizing same molecules is a nop
     if (hist1->cls == hist2->cls) {
         return true;
     }
 
-    if (energy_1 == 0 && energy_2 == 0) {
-        false;
-    }
 
     if (energy_1 == 0) {
         hist1->cls = hist2->cls;

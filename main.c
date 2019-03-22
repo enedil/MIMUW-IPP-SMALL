@@ -11,7 +11,17 @@
 #include "history_manager.h"
 #include "parser.h"
 #include "utils.h"
-
+/*
+void dddd(struct energy_class* begin, struct energy_class* end)
+{
+    printf("\n\nBEGIN===============\n");
+    struct energy_class* ptr = begin;
+    while (ptr != end) {
+        printf("next: %p prev: %p energy: %20lu ref_count: % 10d succ: %p\n",
+                (void*)ptr->next, (void*)ptr->prev, ptr->energy, ptr->ref_count, (void*)ptr->successor);
+        ptr = ptr->next;
+    }
+}*/
 
 int main()
 {
@@ -29,6 +39,8 @@ int main()
         if (errno == ENOMEM) {
             panic();
         }
+
+
         struct call_data cmd = parse(line);
         
         switch (cmd.op) {
@@ -83,9 +95,6 @@ int main()
         }
 
 
-        free(line);
-        line = NULL;
-        line_len = 0;
     }
     
     energy_delete_all(&begin);

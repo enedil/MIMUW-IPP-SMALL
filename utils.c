@@ -51,7 +51,7 @@ uint64_t average(uint64_t a, uint64_t b)
         uint64_t c = a - b;
         return c/2 + b;
     } else {
-        uint64_t c = a - b;
+        uint64_t c = b - a;
         return c/2 + a;
     }
 }
