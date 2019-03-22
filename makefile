@@ -29,7 +29,7 @@ release: all
 
 
 compress: 
-	tar -cvzf m.radwanski.395413.tar.gz $(SRC) $(HEADERS) makefile test.sh
+	tar -cvzf m.radwanski.395415.tar.gz $(SRC) $(HEADERS) makefile test.sh
 
 
 
@@ -44,6 +44,6 @@ include make.deps
 clean:
 	-rm *.o $(EXE)
 	-rm make.deps
-	-rm m.radwanski.395413.tar.gz
+	-rm m.radwanski.395415.tar.gz
 
 .PHONY: all clean debug release make.deps
