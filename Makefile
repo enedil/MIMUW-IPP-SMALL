@@ -3,14 +3,14 @@
 CC = gcc
 #CC = ../afl-2.52b/afl-gcc
 CVERSION = -std=c11
-CDEBUG = -g
-COPTIMIZATION_LEVEL = -O0
-LOG_LEVEL=3
-CFLAGS = $(COPTIMIZATION_LEVEL) $(CDEBUG) $(CVERSION) -DLOG_LEVEL=$(LOG_LEVEL) \
-		 -Werror -Wall -Wextra -pedantic -fsanitize=shift \
+CFALGS_DEBUG = -g  -DLOG_LEVEL=3\
+ 		 -fsanitize=shift \
 		 -fsanitize=integer-divide-by-zero \
 		 -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=null \
 		 -fsanitize=return -fsanitize=signed-integer-overflow
+CFLAGS_RELEASE = -O3 -DLOG_LEVEL=0
+
+CFLAGS = $(CDEBUG) $(CVERSION) -Werror -Wall -Wextra -pedantic
 
 EXE = quantum_history
 
@@ -20,14 +20,16 @@ HEADERS = utils.h parser.h history_manager.h energy_manager.h
 all: $(patsubst %.c, %.o, $(SRC)) $(HEADERS)
 	$(CC) $(CFLAGS) $^ -o $(EXE)
 
+debug: CFLAGS += $(CFLAGS_DEBUG)
+debug: all
+
+release: CFALGS += $(CFLAGS_RELEASE)
+release: all
+
 .c.o:
 	$(CC) $(CFLAGS) $(DEFINES) -c $<
 
-.PHONY: clean
+.PHONY: all clean debug release
 
 clean:
-	-rm *.o
-	-rm $(EXE)
-
-
-
+	-rm *.o $(EXE)
