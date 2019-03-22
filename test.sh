@@ -15,13 +15,8 @@ function print_color {
     printf "$reset\n"
 }
 
-function correct_mark {
-    printf "\u2713"
-}
-
-function wrong_mark {
-    printf "\u274C"
-}
+correct_mark="\u2713"
+wrong_mark="\u274C"
 
 function test_file {
     out=$(mktemp --suffix .out)
@@ -95,11 +90,11 @@ do
     status_code=$?
     if [[ $status_code -eq 0 ]]
     then
-        correct_mark
-        print_color " TEST ${test_input%%.in} PASSED" green
+        printf "$correct_mark "
+        print_color "TEST ${test_input%%.in} PASSED" green
     else
-        wrong_mark
-        print_color " TEST ${test_input%%.in} FAILED" red
+        printf "$wrong_mark "
+        print_color "TEST ${test_input%%.in} FAILED" red
     fi
 
     [ -z "$VALGRIND_DISABLE" ] && test_valgrind "$executable" "$test_input"
