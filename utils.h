@@ -7,6 +7,8 @@
 
 #define QUANTUM_STATE_COUNT 4
 
+// Convert char into an int with numerical value the same as the digit. If input
+// isn't a digit, returns -1.
 int char_to_int(char);
 
 // Exits the process, called if memory allocation failed.
