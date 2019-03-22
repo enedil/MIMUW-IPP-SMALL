@@ -20,6 +20,7 @@ void history_declare(struct history *hist, const char *prefix)
     if (*prefix == '\0') {
         return;
     }
+
     int first_digit = char_to_int(prefix[0]);
     if (hist->next[first_digit] == NULL) {
         // side effect of calloc is setting cls pointer to NULL
@@ -73,9 +74,8 @@ struct history* history_from_str(struct history *hist, const char *hist_string)
 
 uint64_t history_energy_get(struct history *root, const char *hist_string)
 {
-    // 0 means error
-    
     struct history *hist = history_from_str(root, hist_string);
+
     if (hist == NULL) {
         return 0;
     }

@@ -103,10 +103,8 @@ uint64_t energy_get(struct history *hist)
     return hist->cls->energy;
 }
 
-bool energy_set(ecls *begin, 
-                struct history *root, 
-                const char *history_str, 
-                uint64_t energy)
+bool energy_set(ecls *begin, struct history *root, 
+                const char *hist_string, uint64_t energy)
 {
     struct history *hist = history_from_str(root, hist_string);
     if (hist == NULL) {
@@ -145,7 +143,6 @@ bool energy_merge(struct history *root, const char *h1, const char *h2)
     if (hist1->cls == hist2->cls) {
         return true;
     }
-
 
     if (energy_1 == 0) {
         hist1->cls = hist2->cls;

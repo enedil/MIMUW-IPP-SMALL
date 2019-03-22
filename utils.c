@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "error.h"
-
 
 int char_to_int(char c)
 {
