@@ -4,11 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "history_manager.h"
 #include "parser.h"
 #include "utils.h"
 
 
-static bool is_numeric(const char* literal)
+static inline bool is_numeric(const char* literal)
 {
     do {
         if (!isdigit(*literal)) {
@@ -18,8 +19,8 @@ static bool is_numeric(const char* literal)
     return true;
 } 
 
-
-static bool is_valid_history(const char* hist)
+// Checks whether every character is a digit from 0 to QUANTUM_STATE_COUNT
+static inline bool is_valid_history_string(const char* hist)
 {
     do {
         int n = char_to_int(*hist);
@@ -30,14 +31,20 @@ static bool is_valid_history(const char* hist)
     return true;
 }
 
+// As erroneous situations happen quite frequently, this is a function that sets
+// appropriate operation code (o_error) and returns;
+static inline struct call_data set_error(struct call_data* ret)
+{
+    ret->op = o_error;
+    return *ret;
+}
 
 struct call_data parse(char* line)
 {
     struct call_data ret = {0};
     if (line == NULL) {
-        goto error;
+        return set_error(&ret);
     }
-
 
     // This is the only possible form of empty line.
     // It is treated as a nop.
@@ -52,10 +59,9 @@ struct call_data parse(char* line)
         return ret;
     }
 
-
     size_t line_length = strlen(line);
     if (line[line_length - 1] != '\n') {
-        goto error;
+        return set_error(&ret);
     }
 
     line[line_length - 1] = '\0';
@@ -72,21 +78,20 @@ struct call_data parse(char* line)
         }
     }
     if (space_count > 2) {
-        goto error;
+        return set_error(&ret);
     }
 
     // Every commands accepts at least one argument, thus
     // there is at least one space present.
     char *space_pos = strchr(line, ' ');
     if (space_pos == NULL) {
-        goto error;
+        return set_error(&ret);
     }
 
     // Every command is at most 7 characters long.
     if (space_pos - line > 7) {
-        goto error;
+        return set_error(&ret);
     }
-
 
     *space_pos = '\0';
     if (strcmp(line, "DECLARE") == 0) {
@@ -117,17 +122,16 @@ struct call_data parse(char* line)
             ret.op = o_energy2;
             break;
         default:
-            goto error;
+            return set_error(&ret);
         }
     }
     else if (strcmp(line, "EQUAL") == 0) {
         ret.op = o_equal;
     }
     else {
-        goto error;
+        return set_error(&ret);
     }
 
-   
     for (size_t arg_index = 0; arg_index < MAX_ARG_LIST_SIZE; ++arg_index) {
         ret.args[arg_index] = space_pos + 1;
         space_pos = strchr(space_pos + 1, ' ');
@@ -139,11 +143,9 @@ struct call_data parse(char* line)
 
     // Something isn't processed. According to format this is en error.
     if (space_pos != NULL && strchr(space_pos + 1, ' ') != NULL) {
-        goto error;
+        return set_error(&ret);
     }
 
-
-    
     // Check if argument count is valid.
     switch (ret.op) {
     case o_declare:
@@ -151,13 +153,13 @@ struct call_data parse(char* line)
     case o_valid:
     case o_energy1:
         if (ret.args[0] == NULL || ret.args[1] != NULL) {
-            goto error;
+            return set_error(&ret);
         }
         break;
     case o_energy2:
     case o_equal:
         if (ret.args[0] == NULL || ret.args[1] == NULL) {
-            goto error;
+            return set_error(&ret);
         }
         break;
     default:
@@ -167,10 +169,9 @@ struct call_data parse(char* line)
     // Every argument is a string of digits.
     for (size_t i = 0; i < MAX_ARG_LIST_SIZE; ++i) {
         if (ret.args[i] != NULL && !is_numeric(ret.args[i])) {
-            goto error;
+            return set_error(&ret);
         }
     }
-
 
     // First arguments of ENERGY1 should be a valid history.
     // Second argument should be in range [1, 2^64 - 1].
@@ -180,34 +181,31 @@ struct call_data parse(char* line)
 
         size_t len = strlen(ret.args[1]);
         if (len > max_len) {
-            goto error;
+            return set_error(&ret);
         }
         if (len == max_len && strcmp(ret.args[1], max_uint64_t) > 0) {
-            goto error;
+            return set_error(&ret);
         }
 
         // Disallow leading zeros in numbers.
         if (*ret.args[1] == '0' || *ret.args[1] == '\0') {
-            goto error;
+            return set_error(&ret);
         }
 
-        if (!is_valid_history(ret.args[0])) {
-            goto error;
+        if (!is_valid_history_string(ret.args[0])) {
+            return set_error(&ret);
         }
     } 
     else {
         // Every other command takes quantum history strings, which can consist
         // of numbers between 0 and QUANTUM_STATE_COUNT - 1.
         for (size_t i = 0; i < MAX_ARG_LIST_SIZE; ++i) {
-            if (ret.args[i] != NULL && !is_valid_history(ret.args[i])) {
-                goto error;
+            if (ret.args[i] != NULL && !is_valid_history_string(ret.args[i])) {
+                return set_error(&ret);
             }
         }
     }
 
     return ret;
 
-error:
-    ret.op = o_error;
-    return ret;
 }
