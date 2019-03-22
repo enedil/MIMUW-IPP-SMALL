@@ -173,9 +173,7 @@ struct call_data parse(char* line)
     if (ret.op == o_energy2) {
         char max_uint64_t[] = "18446744073709551615";
         size_t max_len = strlen(max_uint64_t);
-//        if (ret.args[1] == NULL) {
-  //          goto error;
-    //    }
+
         size_t len = strlen(ret.args[1]);
         if (len > max_len) {
             goto error;
@@ -200,9 +198,7 @@ struct call_data parse(char* line)
         }
     }
 
-
     return ret;
-
 
 error:
     ret.op = o_error;
