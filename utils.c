@@ -19,6 +19,16 @@ void panic(void)
     exit(1);
 }
 
+void err(void)
+{
+    fprintf(stderr, "ERROR\n");
+}
+
+void ok(void)
+{
+    printf("OK\n");
+}
+
 void free_zero(char** ptr)
 {
     if (ptr == NULL) {
@@ -37,8 +47,22 @@ void logger(const char* c, int level, FILE* fp)
 
 uint64_t average(uint64_t a, uint64_t b)
 {
-    if (a + b > a) {
-        return (a + b)/2 - (((uint64_t)1) << 32);
+    if (a > b) {
+        uint64_t c = a - b;
+        return c/2 + b;
+    } else {
+        uint64_t c = a - b;
+        return c/2 + a;
     }
-    return (a + b) / 2;
 }
+
+uint64_t atoull(const char* number)
+{
+    uint64_t ret = 0;
+    for (size_t i = 0; number[i]; ++i) {
+        ret *= 10;
+        ret += char_to_int(number[i]);
+    }
+    return ret;
+}
+
