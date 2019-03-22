@@ -54,14 +54,16 @@ struct call_data parse(char* line)
 
 
     size_t line_length = strlen(line);
+    if (line[line_length - 1] != '\n') {
+        goto error;
+    }
+
+    line[line_length - 1] = '\0';
+
     if (line_length == 1) {
         ret.op = o_nop;
         return ret;
     }
-    if (line[line_length - 1] != '\n') {
-        goto error;
-    }
-    line[line_length - 1] = '\0';
 
     int space_count = 0;
     for (size_t i = 0; i < line_length - 1; ++i) {
