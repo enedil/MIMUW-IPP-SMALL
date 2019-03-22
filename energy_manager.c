@@ -10,6 +10,27 @@
 
 typedef struct energy_class ecls;
 
+/*
+static bool energy_list_invariant_check(ecls *begin, ecls *end)
+{
+    if (begin->ref_count != -1 || end->ref_count != -1) {
+        return false;
+    }
+    if (begin->energy != 0 || end->energy != 0) {
+        return false;
+    }
+    if (begin->prev != NULL || end->next != NULL) {
+        return false;
+    }
+
+    ecls *ptr = begin;
+    while (ptr != end) {
+        if (ptr->next->prev != ptr) {
+            return false;
+        }
+    }
+}
+*/
 
 static inline bool is_terminal(ecls* node)
 {
