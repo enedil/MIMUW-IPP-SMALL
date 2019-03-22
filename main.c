@@ -38,20 +38,20 @@ int main()
         
         switch (cmd.op) {
             case o_error:
-                fprintf(stderr, "ERROR\n");
+                err();
                 break;
             case o_nop:
                 break;
             case o_remove:
                 history_remove(&hist, cmd.args[0]);
-                printf("OK\n");
+                ok();
                 break;
             case o_declare:
                 history_declare(&hist, cmd.args[0]);
-                printf("OK\n");
+                ok();
                 break;
             case o_valid:
-                if (history_valid(&hist, cmd.args[0])) {
+                if (history_from_str(&hist, cmd.args[0]) != NULL) {
                     printf("YES\n");
                 } else {
                     printf("NO\n");
@@ -59,17 +59,31 @@ int main()
                 break;
             case o_energy1:
                 {
-                    uint64_t e = history_energy1(&hist, cmd.args[0]);
+                    uint64_t e = history_energy_get(&hist, cmd.args[0]);
                     if (e == 0) {
-                        fprintf(stderr, "ERROR\n");
+                        err();
                     } else {
                         printf("%lu\n", e);
                     }
                 }
                 break;
             case o_energy2:
+                {
+                    uint64_t energy = atoull(cmd.args[1]);
+                    if (energy_set(&begin, &hist, cmd.args[0], energy)) {
+                        ok();
+                    } else {
+                        err();
+                    }
+                }
+                break;
+
             case o_equal:
-                logger("not implemented", l_critical, stderr);
+                if (energy_merge(&hist, cmd.args[0], cmd.args[1])) {
+                    ok();
+                } else {
+                    err();
+                }
                 break;
         }
 
