@@ -7,7 +7,7 @@
 #include "utils.h"
 
 
-void history_init(struct history* hist)
+void history_init(struct history *hist)
 {
     hist->cls = NULL;
     for (size_t i = 0; i < QUANTUM_STATE_COUNT; ++i) {
@@ -15,7 +15,7 @@ void history_init(struct history* hist)
     }
 }
 
-void history_declare(struct history* hist, const char* prefix)
+void history_declare(struct history *hist, const char *prefix)
 {
     if (*prefix == '\0') {
         return;
@@ -31,7 +31,7 @@ void history_declare(struct history* hist, const char* prefix)
     history_declare(hist->next[first_digit], prefix + 1);
 }
 
-void history_remove(struct history* hist, const char* prefix)
+void history_remove(struct history *hist, const char *prefix)
 {
     if (*prefix == '\0') {
         for (size_t i = 0; i < QUANTUM_STATE_COUNT; ++i) {
@@ -43,6 +43,7 @@ void history_remove(struct history* hist, const char* prefix)
         }
         return;
     }
+
     int first_digit = char_to_int(prefix[0]);
     if (hist->next[first_digit] != NULL) {
         history_remove(hist->next[first_digit], prefix + 1);
@@ -57,7 +58,7 @@ void history_remove(struct history* hist, const char* prefix)
 
 }
 
-struct history* history_from_str(struct history* hist, const char* hist_string)
+struct history* history_from_str(struct history *hist, const char *hist_string)
 {
     if (hist_string[0] == '\0') {
         return hist;

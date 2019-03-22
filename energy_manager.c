@@ -2,40 +2,18 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
 #include "energy_manager.h"
 #include "history_manager.h"
 #include "utils.h"
 
-
 typedef struct energy_class ecls;
-/*
-static bool energy_list_invariant_check(ecls *begin, ecls *end)
-{
-    if (begin->ref_count != -1 || end->ref_count != -1) {
-        return false;
-    }
-    if (begin->energy != 0 || end->energy != 0) {
-        return false;
-    }
-    if (begin->prev != NULL || end->next != NULL) {
-        return false;
-    }
 
-    ecls *ptr = begin;
-    while (ptr != end) {
-        if (ptr->next->prev != ptr) {
-            return false;
-        }
-    }
-    return true;
-}*/
 
-static inline bool is_terminal(ecls* node)
+// Checks if node indeed represents valid equivalence class of energy.
+static inline bool is_sentinel(ecls *node)
 {
     return node->ref_count == -1 && node->energy == 0;
 }
-
 
 void energy_init(ecls *start, ecls *end)
 {
@@ -70,20 +48,20 @@ ecls* energy_insert_begin(ecls *start, uint64_t energy)
     return ret;
 }
 
-void energy_delete_all(ecls* begin)
+void energy_delete_all(ecls *begin)
 {
     ecls* current = begin->next;
-    while (!is_terminal(current)) {
+    while (!is_sentinel(current)) {
         current = current->next;
         free(current->prev);
     }
 }
 
-// prevents from deleting begin and end, since they are not heap-allocated 
-// (and are required for subsequent correct functioning of data structures
-void energy_delete(ecls* node)
+// Prevents from deleting begin and end, since they are not heap-allocated 
+// (and are required for subsequent correct functioning of data structure).
+void energy_delete(ecls *node)
 {
-    if (is_terminal(node)) {
+    if (is_sentinel(node)) {
         return;
     }
 
@@ -96,7 +74,8 @@ void energy_delete(ecls* node)
     free(node);
 }
 
-
+// Straighten the path leading from hist node into its' equivalence class of
+// energy.
 static inline void compress_energy_path(struct history *hist)
 {
     if (hist->cls->successor == NULL) {
@@ -113,9 +92,7 @@ static inline void compress_energy_path(struct history *hist)
     compress_energy_path(hist);
 }
 
-// TODO: what if input is NULL?
-
-// erroneus output is 0
+// Erroneus output is 0, as it is an illegal level of energy.
 uint64_t energy_get(struct history *hist)
 {
     if (hist->cls == NULL) {
@@ -125,9 +102,10 @@ uint64_t energy_get(struct history *hist)
     return hist->cls->energy;
 }
 
-
-// assigns energy for a molecule
-bool energy_set(ecls *begin, struct history* root, const char *hist_string, uint64_t energy)
+bool energy_set(ecls *begin, 
+                struct history *root, 
+                const char *history_str, 
+                uint64_t energy)
 {
     struct history *hist = history_from_str(root, hist_string);
     if (hist == NULL) {
@@ -142,8 +120,7 @@ bool energy_set(ecls *begin, struct history* root, const char *hist_string, uint
     return true;
 }
 
-
-// true if success, false if failure
+// True if merge is successfull, false otherwise.
 bool energy_merge(struct history *root, const char *h1, const char *h2)
 {
     struct history *hist1 = history_from_str(root, h1);
@@ -156,14 +133,14 @@ bool energy_merge(struct history *root, const char *h1, const char *h2)
         return true;
     }
 
-    // side effect is compressing paths, thus it is done before the next
-    // conditional
+    // Path compression is a side effect, thus it is done before the next
+    // conditional.
     uint64_t energy_1 = energy_get(hist1), energy_2 = energy_get(hist2);
     if (energy_1 == 0 && energy_2 == 0) {
         return false;
     }
 
-    // according to specification, equalizing same molecules is a nop
+    // According to specification, equalizing same molecules is a nop.
     if (hist1->cls == hist2->cls) {
         return true;
     }
@@ -172,15 +149,19 @@ bool energy_merge(struct history *root, const char *h1, const char *h2)
     if (energy_1 == 0) {
         hist1->cls = hist2->cls;
         hist1->cls->ref_count++;
-    } else if (energy_2 == 0) {
+    } 
+    else if (energy_2 == 0) {
         hist2->cls = hist1->cls;
         hist2->cls->ref_count++;
-    } else {
+    } 
+    else {
+        // Wire smaller equivalence class to bigger.
         if (hist1->cls->ref_count > hist2->cls->ref_count) {
             hist1->cls->energy = average(energy_1, energy_2);
             hist2->cls->energy = 0;
             hist2->cls->successor = hist1->cls;
-        } else {
+        } 
+        else {
             hist2->cls->energy = average(energy_1, energy_2);
             hist1->cls->energy = 0;
             hist1->cls->successor = hist2->cls;

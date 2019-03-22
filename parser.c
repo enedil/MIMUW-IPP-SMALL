@@ -96,7 +96,7 @@ struct call_data parse(char* line)
     } else if (strcmp(line, "VALID") == 0) {
         ret.op = o_valid;
     } else if (strcmp(line, "ENERGY") == 0) {
-        // Count the number of occurences of space.
+        // Count the number of occurences of spaces.
         int count = 0;
         char *c = space_pos + 1;
         while (*c) {
@@ -107,14 +107,14 @@ struct call_data parse(char* line)
         }
 
         switch (count) {
-            case 0:
-                ret.op = o_energy1;
-                break;
-            case 1:
-                ret.op = o_energy2;
-                break;
-            default:
-                goto error;
+        case 0:
+            ret.op = o_energy1;
+            break;
+        case 1:
+            ret.op = o_energy2;
+            break;
+        default:
+            goto error;
         }
     } else if (strcmp(line, "EQUAL") == 0) {
         ret.op = o_equal;
@@ -132,8 +132,7 @@ struct call_data parse(char* line)
         *space_pos = '\0';
     }
 
-    //
-    // Something isn't processed, according to format this is en error.
+    // Something isn't processed. According to format this is en error.
     if (space_pos != NULL && strchr(space_pos + 1, ' ') != NULL) {
         goto error;
     }
@@ -142,22 +141,22 @@ struct call_data parse(char* line)
     
     // Check if argument count is valid.
     switch (ret.op) {
-        case o_declare:
-        case o_remove:
-        case o_valid:
-        case o_energy1:
-            if (ret.args[0] == NULL || ret.args[1] != NULL) {
-                goto error;
-            }
-            break;
-        case o_energy2:
-        case o_equal:
-            if (ret.args[0] == NULL || ret.args[1] == NULL) {
-                goto error;
-            }
-            break;
-        default:
-            break;
+    case o_declare:
+    case o_remove:
+    case o_valid:
+    case o_energy1:
+        if (ret.args[0] == NULL || ret.args[1] != NULL) {
+            goto error;
+        }
+        break;
+    case o_energy2:
+    case o_equal:
+        if (ret.args[0] == NULL || ret.args[1] == NULL) {
+            goto error;
+        }
+        break;
+    default:
+        break;
     }
 
     // Every argument is a string of digits.
@@ -168,8 +167,8 @@ struct call_data parse(char* line)
     }
 
 
-    // first arguments of ENERGY1 should be a valid history
-    // second argument should be in range [1, 2^64 - 1]
+    // First arguments of ENERGY1 should be a valid history.
+    // Second argument should be in range [1, 2^64 - 1].
     if (ret.op == o_energy2) {
         char max_uint64_t[] = "18446744073709551615";
         size_t max_len = strlen(max_uint64_t);
@@ -181,6 +180,8 @@ struct call_data parse(char* line)
         if (len == max_len && strcmp(ret.args[1], max_uint64_t) > 0) {
             goto error;
         }
+
+        // Disallow leading zeros in numbers.
         if (*ret.args[1] == '0' || *ret.args[1] == '\0') {
             goto error;
         }
@@ -189,8 +190,8 @@ struct call_data parse(char* line)
             goto error;
         }
     } else {
-        // every other command takes quantum history strings, which can consist
-        // of numbers from 0 to QUANTUM_STATE_COUNT - 1
+        // Every other command takes quantum history strings, which can consist
+        // of numbers between 0 and QUANTUM_STATE_COUNT - 1.
         for (size_t i = 0; i < MAX_ARG_LIST_SIZE; ++i) {
             if (ret.args[i] != NULL && !is_valid_history(ret.args[i])) {
                 goto error;
