@@ -49,7 +49,8 @@ int main()
         case o_valid:
             if (history_from_str(&hist, cmd.args[0]) != NULL) {
                 printf("YES\n");
-            } else {
+            }
+            else {
                 printf("NO\n");
             }
             break;
@@ -58,7 +59,8 @@ int main()
                 uint64_t e = history_energy_get(&hist, cmd.args[0]);
                 if (e == 0) {
                     err();
-                } else {
+                }
+                else {
                     printf("%lu\n", e);
                 }
             }
@@ -68,7 +70,8 @@ int main()
                 uint64_t energy = atoull(cmd.args[1]);
                 if (energy_set(&begin, &hist, cmd.args[0], energy)) {
                     ok();
-                } else {
+                } 
+                else {
                     err();
                 }
             }
@@ -77,7 +80,8 @@ int main()
         case o_equal:
             if (energy_merge(&hist, cmd.args[0], cmd.args[1])) {
                 ok();
-            } else {
+            } 
+            else {
                 err();
             }
             break;
