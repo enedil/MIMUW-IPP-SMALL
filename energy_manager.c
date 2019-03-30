@@ -78,13 +78,18 @@ void energy_delete(ecls *node)
 // energy.
 static inline void compress_energy_path(struct history *hist)
 {
+    if (hist->cls == NULL) {
+        return;
+    }
     if (hist->cls->successor == NULL) {
         return;
     }
 
     hist->cls->ref_count--;
     if (hist->cls->ref_count == 0) {
-        energy_delete(hist->cls);
+        ecls* cls = hist->cls;
+        hist->cls = hist->cls->successor;
+        energy_delete(cls);
     }
     else {
         hist->cls->successor->ref_count++;
@@ -100,6 +105,9 @@ uint64_t energy_get(struct history *hist)
         return 0;
     }
     compress_energy_path(hist);
+    if (hist->cls == NULL) {
+        return 0;
+    }
     return hist->cls->energy;
 }
 
