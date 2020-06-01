@@ -31,18 +31,21 @@ function test_file {
     "$executable" < "$in_test" >"$out" 2>"$err"
     if [ "$?" != 0 ];
     then
+        rm $out $err
         return 1
     fi
 
     cmp -s "$out" "$out_test"
     if [ "$?" != 0 ];
     then
+        rm $out $err
         return 1
     fi
 
     cmp -s "$err" "$err_test"
     if [ "$?" != 0 ];
     then
+        rm $out $err
         return 1
     fi
         
@@ -56,6 +59,7 @@ function test_valgrind {
     err=$(mktemp --suffix err)
 
     valgrind --leak-check=full --show-leak-kinds=all --errors-for-leak-kinds=all "$executable" < "$in_test" 2>&1 > /dev/null | awk '/SUMMARY/{y=1}y'
+    rm $err
 }
 
 function help {
